@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import UserModal from "./UserModal";
 
 const Users = () => {
   const [data, setData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetch("https://dummyjson.com/users")
@@ -17,6 +19,7 @@ const Users = () => {
       });
   }, []);
 
+  // filtered And Sorted Users
   const filteredAndSortedUsers = data.users
     ? data.users
         .filter(
@@ -47,8 +50,44 @@ const Users = () => {
     { value: "company", label: "Sort by Company" },
   ];
 
+  const handleAddUser = (userData) => {
+    fetch("https://dummyjson.com/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    })
+      .then((res) => res.json())
+      .then((newUser) => {
+        setData((prevData) => ({
+          ...prevData,
+          users: [...prevData.users, newUser],
+        }));
+
+        setIsModalOpen(false);
+      })
+      .catch((error) => {
+        console.error("Error adding user:", error);
+      });
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Add user modal */}
+      <button
+        className="btn btn-outline btn-access border-0 border-b-4 bg-gradient-to-r from-slate-500 via-slate-400 to-amber-100 mt-4 text-black me-3"
+        onClick={() => setIsModalOpen(true)}
+      >
+        Add User
+      </button>
+      <UserModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleAddUser}
+      />
+
+      {/* Search Input */}
       <input
         type="text"
         placeholder="Search by name"
@@ -57,6 +96,7 @@ const Users = () => {
         className="mb-4 p-2 border border-gray-300 rounded-md me-3"
       />
 
+      {/* Sorting */}
       <select
         value={sortOption}
         onChange={(e) => setSortOption(e.target.value)}
