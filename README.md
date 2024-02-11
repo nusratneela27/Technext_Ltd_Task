@@ -1,4 +1,4 @@
-## [live link] ()
+## [live link] (https://technextltd.netlify.app/)
 
 ## Features
 
