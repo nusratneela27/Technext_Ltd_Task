@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 
 const Users = () => {
   const [data, setData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState("");
 
   useEffect(() => {
     fetch("https://dummyjson.com/users")
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         setData(result);
       })
       .catch((error) => {
@@ -16,14 +17,61 @@ const Users = () => {
       });
   }, []);
 
+  const filteredAndSortedUsers = data.users
+    ? data.users
+        .filter(
+          (user) =>
+            user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            user.lastName.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .sort((a, b) => {
+          switch (sortOption) {
+            case "name":
+              return (a.firstName + a.lastName).localeCompare(
+                b.firstName + b.lastName
+              );
+            case "email":
+              return a.email.localeCompare(b.email);
+            case "company":
+              return a.company.name.localeCompare(b.company.name);
+            default:
+              return 0;
+          }
+        })
+    : [];
+
+  const sortOptions = [
+    { value: "name", label: "Sort by.." },
+    { value: "name", label: "Sort by Name" },
+    { value: "email", label: "Sort by Email" },
+    { value: "company", label: "Sort by Company" },
+  ];
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-stone-800 mt-5 mb-5">
-        All user : {data.users ? data.users.length : 0}
-      </h1>
+      <input
+        type="text"
+        placeholder="Search by name"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="mb-4 p-2 border border-gray-300 rounded-md me-3"
+      />
+
+      <select
+        value={sortOption}
+        onChange={(e) => setSortOption(e.target.value)}
+        className="mb-4 p-2 border border-gray-300 rounded-md"
+      >
+        {sortOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
         {data.users &&
-          data.users.map((user) => (
+          filteredAndSortedUsers.map((user) => (
             <div key={user.id} className="bg-white shadow-md rounded-md p-4">
               <img
                 src={user.image}
@@ -51,33 +99,3 @@ const Users = () => {
 };
 
 export default Users;
-
-// import { useState } from "react";
-// import { useLoaderData } from "react-router-dom";
-
-// const Users = () => {
-//   const loadData = useLoaderData();
-//   const [data, setData] = useState(loadData);
-//   console.log(loadData);
-
-//   return (
-//     <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-[2520px] mx-auto xl:px-20 md:px-10 sm:px-2 px-4">
-//       {data.users.map((user) => (
-//         <div key={user.id}>
-//           <div className="card w-96 bg-base-100 shadow-xl">
-//             <img src={user.image} />
-//             <h1>
-//               Name: {user.firstName} {user.lastName}
-//             </h1>
-//             <p>Email: {user.email}</p>
-//             <p>Address: {user.address.address}</p>
-//             <p>City: {user.address.city}</p>
-//             <h1></h1>
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   );
-// };
-
-// export default Users;
