@@ -9,7 +9,6 @@ const UserDetails = () => {
     fetch(`https://dummyjson.com/users/${userId}`)
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         setData(result);
       })
       .catch((error) => {
@@ -21,7 +20,7 @@ const UserDetails = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 items-center bg-white shadow-md rounded-md p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 items-center bg-white shadow-md rounded-md p-4">
         <img
           src={data.image}
           alt="Avatar"
